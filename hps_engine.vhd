@@ -56,12 +56,13 @@ begin
             axi_awvalid <= '1';
             wait until clk = '1' and clk'event;
             wait until axi_awready = '1';
+            wait until clk = '1' and clk'event;
             axi_awvalid <= '0';
         
             axi_wdata <= can_data(i);
             axi_wvalid <= '1';
             wait until clk = '1' and clk'event;
-            wait until axi_wready = '1';
+            --wait until axi_wready = '1';
         
         
             axi_bready <= '1';
