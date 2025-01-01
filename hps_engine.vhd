@@ -4,44 +4,51 @@ use ieee.numeric_std.all;
 
 entity hps_engine is 
     port (
-        clk            : in std_logic;
-        rst_n          : in std_logic;
+        clk            : in     std_logic;
+        rst_n          : in     std_logic;
 
-        axi_awaddr     : out std_logic_vector(20 downto 0)                          := (others => '0');
-        axi_awvalid    : out std_logic                                              := '0';
-        axi_awready    : in std_logic                                               := '0';
+        axi_awaddr     : out    std_logic_vector(20 downto 0)                       := (others => '0');
+        axi_awvalid    : out    std_logic                                           := '0';
+        axi_awready    : in     std_logic                                           := '0';
       
-        axi_wdata      : out std_logic_vector(31 downto 0)                          := (others => '0');
-        axi_wvalid     : out std_logic                                              := '0';
-        axi_wready     : in std_logic                                               := '0';
+        axi_wdata      : out    std_logic_vector(31 downto 0)                       := (others => '0');
+        axi_wvalid     : out    std_logic                                           := '0';
+        axi_wready     : in     std_logic                                           := '0';
+        axi_wstrb      : out    std_logic_vector(3 downto 0)                        := (others => '0');
       
-        axi_bresp      : in std_logic_vector(1 downto 0)                            := (others => '0');
-        axi_bvalid     : in std_logic                                               := '0';
-        axi_bready     : out std_logic                                              := '0';
+        axi_bresp      : in     std_logic_vector(1 downto 0)                        := (others => '0');
+        axi_bvalid     : in     std_logic                                           := '0';
+        axi_bready     : out    std_logic                                           := '0';
       
-        axi_araddr     : out std_logic_vector(20 downto 0)                          := (others => '0');
-        axi_arvalid    : out std_logic                                              := '0';
-        axi_arready    : in std_logic                                               := '0';
+        axi_araddr     : out    std_logic_vector(20 downto 0)                       := (others => '0');
+        axi_arvalid    : out    std_logic                                           := '0';
+        axi_arready    : in     std_logic                                           := '0';
       
-        axi_rdata      : in std_logic_vector(31 downto 0)                           := (others => '0');
-        axi_rresp      : in std_logic_vector(1 downto 0)                            := (others => '0');
-        axi_rvalid     : in std_logic                                               := '0';
-        axi_rready     : out std_logic                                              := '0'
+        axi_rdata      : in     std_logic_vector(31 downto 0)                       := (others => '0');
+        axi_rresp      : in     std_logic_vector(1 downto 0)                        := (others => '0');
+        axi_rvalid     : in     std_logic                                           := '0';
+        axi_rready     : out    std_logic                                           := '0'
     );
 end entity;
 
 architecture tbench of hps_engine is
-    type can_frame_addresses_t is array (0 to 1) of std_logic_vector(20 downto 0);
-    type axi_data_t is array(0 to 1) of std_logic_vector(31 downto 0);
+    type can_frame_addresses_t  is array (0 to 1) of    std_logic_vector(20 downto 0);
+    type axi_data_t             is array (0 to 1) of    std_logic_vector(31 downto 0);
+    type axi_wstr_t             is array (0 to 1) of    std_logic_vector(3 downto 0);
 
     signal can_frame_addresses : can_frame_addresses_t := (
         0 => "000000000000000000000", 
         1 => "000000000000000000100"
     );
 
-    signal can_data : axi_data_t :=(
+    signal can_data_s : axi_data_t :=(
         0 => x"DEADBEEF",
         1 => x"DEADAFFE"
+    );
+
+    signal axi_wstr_s : axi_wstr_t := (
+        0 => "1111",
+        1 => "0011"
     );
 begin
 
@@ -59,11 +66,10 @@ begin
             wait until clk = '1' and clk'event;
             axi_awvalid <= '0';
         
-            axi_wdata <= can_data(i);
+            axi_wdata <= can_data_s(i);
+            axi_wstrb <= axi_wstr_s(i);
             axi_wvalid <= '1';
-            wait until clk = '1' and clk'event;
-            --wait until axi_wready = '1';
-        
+            wait until clk = '1' and clk'event; 
         
             axi_bready <= '1';
             wait until axi_bvalid = '1';

@@ -57,6 +57,7 @@ begin
             axi_wdata           => axi_intf_o_s.axi_wdata,
             axi_wvalid          => axi_intf_o_s.axi_wvalid,
             axi_wready          => axi_intf_i_s.axi_wready,
+            axi_wstrb           => axi_intf_o_s.axi_wstrb,
 
             axi_bresp           => axi_intf_i_s.axi_bresp,
             axi_bvalid          => axi_intf_i_s.axi_bvalid,

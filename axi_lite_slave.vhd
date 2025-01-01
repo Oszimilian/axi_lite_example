@@ -77,6 +77,7 @@ begin
 			S_AxiLite_RData			=> axi_input_s.axi_rdata,
 			S_AxiLite_RValid		=> axi_input_s.axi_rvalid,
 			S_AxiLite_RReady		=> axi_ouput_s.axi_rready,
+            S_AxiLite_RResp         => axi_input_s.axi_rresp,
 			
 			Rb_Addr					=> rb_addr,
 			Rb_Wr					=> rb_wr,
@@ -96,9 +97,41 @@ begin
             if rb_wr = '1' then
                 case rb_addr is 
                     when "000000000000000000000" => 
-                        a_reg_s             <= rb_wr_data;
+                        case rb_byte_ena is
+                            when "1111" =>
+                                a_reg_s                     <= rb_wr_data;
+                            when "0111" =>
+                                a_reg_s(23 downto 0)        <= rb_wr_data(23 downto 0);
+                                a_reg_s(31 downto 24)       <= (others => '0'); 
+                            when "0011" =>
+                                a_reg_s(15 downto 0)        <= rb_wr_data(15 downto 0);
+                                a_reg_s(31 downto 16)       <= (others => '0');
+                            when "0001" =>
+                                a_reg_s(7 downto 0)         <= rb_wr_data(7 downto 0);
+                                a_reg_s(31 downto 8)        <= (others => '0');
+                            when "0000" =>
+                                a_reg_s                     <= (others => '0');
+                            when others => 
+                                a_reg_s                     <= (others => '0');
+                        end case;
                     when "000000000000000000100" =>
-                        b_reg_s             <= rb_wr_data;
+                        case rb_byte_ena is 
+                            when "1111" =>
+                                b_reg_s                     <= rb_wr_data;
+                            when "0111" =>
+                                b_reg_s(23 downto 0)        <= rb_wr_data(23 downto 0);
+                                b_reg_s(31 downto 24)       <= (others => '0'); 
+                            when "0011" =>
+                                b_reg_s(15 downto 0)        <= rb_wr_data(15 downto 0);
+                                b_reg_s(31 downto 16)       <= (others => '0');
+                            when "0001" =>
+                                b_reg_s(7 downto 0)         <= rb_wr_data(7 downto 0);
+                                b_reg_s(31 downto 8)        <= (others => '0');
+                            when "0000" =>
+                                b_reg_s                     <= (others => '0');
+                            when others => 
+                                b_reg_s                     <= (others => '0');
+                        end case;
                     when others => null;
                 end case;
             end if;
